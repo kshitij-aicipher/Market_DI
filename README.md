@@ -29,28 +29,9 @@ Have created a unified FastAPI application combining **Marketing Intelligence (M
 └── training/            # Training scripts 
 ```
 
----
 
-## Installation & Local Setup
 
-### Prerequisites
-- Python 3.8+ (Recommended 3.8 to match model training)
-- Docker (optional)
-
-### 1. Clone & Install Dependencies
-```bash
-git clone <repo-url>
-cd <repo-name>
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install requirements
-pip install -r requirements.txt
-```
-
-### 2. Environment Configuration
+### Environment Configuration
 Create a `.env` file in the root directory:
 ```ini
 OPENAI_API_KEY=sk-your-key-here
@@ -58,18 +39,12 @@ LLM_MODEL=gpt-3.5-turbo(or any)
 LLM_TEMPERATURE=0.2
 ```
 
-### 3. Run Application
-```bash
-uvicorn app.main:app --reload
-```
-Access Swagger UI at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
 
 ### Run Container
 ```bash
 docker run -p 8000:8000 --env-file .env mi-rag-app
 ```
-
+Access Swagger UI at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 ---
 
 ## API Endpoints
@@ -176,7 +151,7 @@ RAG performance was evaluated using a manually created evaluation dataset.
 **Evaluation Metrics:**
 1. **Grounding (0.62)**  
    Measured by checking token overlap between the generated answer and the retrieved context.  
-   *(Threshold kept intentionally low.)*
+   *(Threshold was kept low.)*
 
 2. **Factuality (0.68)**  
    Evaluated using an LLM-as-a-judge approach.
