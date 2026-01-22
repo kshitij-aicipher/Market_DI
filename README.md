@@ -190,7 +190,7 @@ RAG performance was evaluated using a manually created evaluation dataset.
 
 ## Potential Improvements
 
-Due to time constraints and a focus on demonstrating the **business-oriented approach**, some components were intentionally scoped down.  
+Due to time constraints at my end and a focus on demonstrating the **business-oriented approach**, some important components were skipped.  
 Below are areas that would make the solution more **robust and production-ready**.
 
 ---
