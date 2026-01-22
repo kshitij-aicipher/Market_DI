@@ -166,6 +166,7 @@ The table below summarizes the performance of trained regression models on the v
     "r2": 0.09850703322563292
   }
 }
+```
 
 
 ## RAG Evaluation
