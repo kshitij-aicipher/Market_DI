@@ -113,6 +113,32 @@ Have used FAISS for lightweight and on the fly manipulations.
 Very lightweight models as dataset was not huge.
 
 
+## Model Evaluation Metrics
+
+The table below summarizes the performance of trained regression models on the validation dataset.
+
+**Metrics used:**
+- **RMSE** – Root Mean Squared Error  
+- **MAE** – Mean Absolute Error  
+- **R²** – Coefficient of Determination  
+
+| Target Variable        | RMSE     | MAE      | R² Score |
+|------------------------|----------|----------|----------|
+| Discounted Price       | 1517.02  | 630.73   | 0.9545   |
+| Actual Price           | 2574.21  | 1010.03  | 0.9451   |
+| Discount Percentage    | 13.72    | 10.18    | 0.5181   |
+| Rating                 | 0.2151   | 0.1546   | 0.4035   |
+| Rating Count           | 241.69   | 186.27   | 0.0985   |
+
+### Notes
+
+- Price prediction models (`actual_price`, `discounted_price`) achieve high accuracy with **R² > 0.94**.
+- Discount percentage and rating show moderate predictive power.
+- Rating count is highly noisy and therefore has lower explanatory power.
+
+### Raw Evaluation Output
+
+```json
 {
   "discounted_price": {
     "rmse": 1517.0224957995272,
@@ -141,24 +167,78 @@ Very lightweight models as dataset was not huge.
   }
 }
 
+
+## RAG Evaluation
+
+RAG performance was evaluated using a manually created evaluation dataset.
+
+**Evaluation Metrics:**
+1. **Grounding (0.62)**  
+   Measured by checking token overlap between the generated answer and the retrieved context.  
+   *(Threshold kept intentionally low.)*
+
+2. **Factuality (0.68)**  
+   Evaluated using an LLM-as-a-judge approach.
+
+**Observed Failure Cases:**
+- Reviews containing conflicting opinions
+- Generic or subjective questions requiring detailed judgment
+- Product descriptions lacking sufficient detail
+
+---
+
 ## Potential Improvements
-There are few parts, which I have skipped due to time constraint on my end (Focus was on business approach to given problem).
-These are pointers which I'd like to mention, would've made it more robust and end to end POC worthy.
 
-1. APIs - Could use JWT token for restricting unauthorised users. which will check for token on each call.
-        - Giving access to APIs based on user type. For ex - 
-            'admin' will have access to price strategy and dynamic pricing
-            'consumer' can ask questions regarding product suggestions/reviews
-        - Logs for each API call, storing username who triggered at what time.
+Due to time constraints and a focus on demonstrating the **business-oriented approach**, some components were intentionally scoped down.  
+Below are areas that would make the solution more **robust and production-ready**.
 
-2. Model  - Integration of MLflow/kubeflow to keep and track the model versions along with model summary. Triggering retraining when detectd model drift based on provided parameters, also considering we have significant additoinal/improved data available.
-          - Serve models through APIs (For scaling) and maintain featurestore.
-          - As I took only 1500 datapoints, didn't work much on improving accuracy. With more data, it can be done.
+---
 
-3. RAG  - Can add support for more LLM APIs. Currently supports openai.
-        - Haven't added any rerankers or much manipulation for improved accuracy. can be optimized in future.
+### API Layer
 
-4.  - Can create **Streamlit/Gradio** UI for better experience. Currently working on basic swagger UI.
-    - Haven't added docker-compose as currently running everything in single app.
-    - Haven't added versions in requirements
-    - Dockerfile is not optimized and haven't included folders of sentence-transformers, so it may attempt to download when creating container.
+- Implement **JWT-based authentication** to restrict unauthorized access.
+- Enable **role-based access control (RBAC)**:
+  - `admin` → access to price strategy and dynamic pricing APIs
+  - `consumer` → access to product suggestions and review-based queries
+- Add **API request logging**, capturing:
+  - Username
+  - Timestamp
+  - Endpoint accessed
+
+---
+
+### Model Lifecycle & MLOps
+
+- Integrate **MLflow / Kubeflow** for:
+  - Model versioning
+  - Experiment tracking
+  - Storing model summaries and metrics
+- Detect **model drift** and trigger automated retraining based on:
+  - Statistical drift
+  - Availability of significant new or improved data
+- Serve models via **dedicated inference APIs** for scalability.
+- Introduce a **feature store** for consistent training and inference pipelines.
+- Limited accuracy optimization was performed due to using only ~1500 data points.  
+  Performance can be significantly improved with larger datasets.
+
+---
+
+### RAG Enhancements
+
+- Add support for **multiple LLM providers** (currently supports OpenAI only).
+- Introduce **rerankers** and advanced retrieval strategies to improve answer relevance.
+- Optimize prompt engineering and context selection logic.
+
+---
+
+### Platform & Deployment
+
+- Build a **Streamlit / Gradio UI** for better user experience  
+  *(currently using basic Swagger UI)*.
+- Add **docker-compose** for multi-service deployment (API, vector store, model service).
+- Pin **dependency versions** in `requirements.txt`.
+- Optimize the Dockerfile:
+  - Use multi-stage builds
+  - Reduce image size
+  - Pre-bundle `sentence-transformers` models to avoid runtime downloads
+
